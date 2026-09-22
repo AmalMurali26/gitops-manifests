@@ -2,12 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend-hpa
-  metadata:
-  name: app-ingress
   namespace: {{ .Values.global.namespace }}
-  labels:
-    {{- include "three-tier-app.labels" . | nindent 4 }}
-    app: backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -16,9 +11,9 @@ spec:
   minReplicas: {{ .Values.backend.hpa.minReplicas }}
   maxReplicas: {{ .Values.backend.hpa.maxReplicas }}
   metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: {{ .Values.backend.hpa.targetCPUUtilizationPercentage }}
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.backend.hpa.targetCPUUtilizationPercentage }}
