@@ -5,11 +5,12 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "backend-config"}'
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.backend.port }}
-      targetPort: {{ .Values.backend.port }}
+    - port: {{ .Values.backend.port | default 5000 }}
+      targetPort: {{ .Values.backend.port | default 5000 }}
       protocol: TCP
       name: http
   selector:
