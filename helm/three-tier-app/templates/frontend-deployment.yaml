@@ -2,14 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-deployment
-  metadata:
-  name: app-ingress
   namespace: {{ .Values.global.namespace }}
-  labels:
-    {{- include "three-tier-app.labels" . | nindent 4 }}
-    app: frontend
 spec:
-  replicas: {{ .Values.frontend.replicas }}
+  replicas: {{ .Values.frontend.replicaCount | default 1 }}
   selector:
     matchLabels:
       app: frontend
@@ -19,27 +14,15 @@ spec:
         app: frontend
     spec:
       containers:
-        - name: frontend
-          image: "{{ .Values.frontend.image }}:{{ .Values.frontend.tag }}"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: {{ .Values.frontend.port }}
-          resources:
-            requests:
-              cpu: {{ .Values.frontend.resources.requests.cpu }}
-              memory: {{ .Values.frontend.resources.requests.memory }}
-            limits:
-              cpu: {{ .Values.frontend.resources.limits.cpu }}
-              memory: {{ .Values.frontend.resources.limits.memory }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.frontend.port }}
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.frontend.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 5
+      - name: frontend
+        image: {{ if kindIs "map" .Values.frontend.image }}"{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"{{ else if .Values.frontend.tag }}"{{ .Values.frontend.image }}:{{ .Values.frontend.tag }}"{{ else }}"{{ .Values.frontend.image }}"{{ end }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi

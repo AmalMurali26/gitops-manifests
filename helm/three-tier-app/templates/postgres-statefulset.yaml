@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: {{ printf "%s" .Values.postgres.image | trimSuffix ":" | quote }}
+        image: "postgres:15-alpine"
         ports:
-        - containerPort: {{ .Values.postgres.port }}
+        - containerPort: {{ .Values.postgres.port | default 5432 }}
           name: postgres
         env:
         - name: POSTGRES_DB
@@ -37,4 +37,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ if kindIs "map" .Values.postgres.storage }}{{ .Values.postgres.storage.size }}{{ else }}{{ .Values.postgres.storage | default "10Gi" }}{{ end }}
+          storage: 1Gi
