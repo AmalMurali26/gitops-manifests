@@ -2,10 +2,9 @@ global:
   gcpProjectId: "project-2f0ca310-6577-4bf2-93e"
   region: "asia-south1"
   namespace: "three-tier-app"
-
 frontend:
   image: "asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend"
-  tag: "latest"
+  tag: "4e10eb88a7595a976893d307938cb1ba2407ceb2"
   replicas: 2
   port: 80
   resources:
@@ -19,7 +18,6 @@ frontend:
     minReplicas: 2
     maxReplicas: 5
     targetCPUUtilizationPercentage: 70
-
 backend:
   image: "asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/backend-repo/backend"
   tag: "latest"
@@ -36,7 +34,6 @@ backend:
     minReplicas: 2
     maxReplicas: 5
     targetCPUUtilizationPercentage: 70
-
 postgres:
   image: "postgres:15-alpine"
   port: 5432
