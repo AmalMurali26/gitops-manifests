@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres-db
-  metadata:
-  name: app-ingress
   namespace: {{ .Values.global.namespace }}
 spec:
   serviceName: postgres-service
@@ -17,26 +15,26 @@ spec:
         app: postgres
     spec:
       containers:
-        - name: postgres
-          image: { { .Values.postgres.image } }
-          ports:
-            - containerPort: { { .Values.postgres.port } }
-              name: postgres
-          env:
-            - name: POSTGRES_DB
-              value: { { .Values.postgres.dbName } }
-            - name: POSTGRES_USER
-              value: { { .Values.postgres.dbUser } }
-            - name: POSTGRES_PASSWORD
-              value: { { .Values.postgres.dbPassword } }
-          volumeMounts:
-            - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
+      - name: postgres
+        image: "{{ .Values.postgres.image }}:{{ .Values.postgres.tag }}"
+        ports:
+        - containerPort: {{ .Values.postgres.port }}
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.postgres.dbName | default "webapp" | quote }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgres.user | default "postgres" | quote }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgres.password | default "postgres" | quote }}
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
-    - metadata:
-        name: postgres-storage
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: { { .Values.postgres.storage } }
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ if kindIs "map" .Values.postgres.storage }}{{ .Values.postgres.storage.size }}{{ else }}{{ .Values.postgres.storage | default "10Gi" }}{{ end }}
