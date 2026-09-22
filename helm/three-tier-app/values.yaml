@@ -1,0 +1,46 @@
+global:
+  gcpProjectId: "project-2f0ca310-6577-4bf2-93e"
+  region: "asia-south1"
+  namespace: "three-tier-app"
+
+frontend:
+  image: "asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend"
+  tag: "initial"
+  replicas: 2
+  port: 80
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+  hpa:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+backend:
+  image: "asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/backend-repo/backend"
+  tag: "initial"
+  replicas: 2
+  port: 5000
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+  hpa:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+postgres:
+  image: "postgres:15-alpine"
+  port: 5432
+  storage: 10Gi
+  dbName: "appdb"
+  dbUser: "appuser"
+  dbPassword: "ChangeMeInSecret123!"

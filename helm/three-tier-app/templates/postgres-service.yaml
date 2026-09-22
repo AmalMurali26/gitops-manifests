@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  metadata:
+  name: app-ingress
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "three-tier-app.labels" . | nindent 4 }}
+    app: postgres
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.postgres.port }}
+      name: postgres
+      targetPort: 5432
+  selector:
+    app: postgres
