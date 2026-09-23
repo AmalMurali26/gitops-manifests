@@ -4,7 +4,6 @@ metadata:
   name: frontend-deployment
   namespace: {{ .Values.global.namespace }}
 spec:
-  replicas: {{ .Values.frontend.replicaCount | default 1 }}
   selector:
     matchLabels:
       app: frontend
