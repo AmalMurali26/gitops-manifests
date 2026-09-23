@@ -7,31 +7,31 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - http:
-      paths:
-      # 1. Backend REST API
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: backend-service
-            port:
-              number: 5000
+    - http:
+        paths:
+          # 1. Backend REST API (matches /api and /api/users)
+          - path: /api/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 5000
 
-      # 2. ArgoCD UI & API
-      - path: /argocd
-        pathType: Prefix
-        backend:
-          service:
-            name: argocd-server-external
-            port:
-              number: 80
+          # 2. ArgoCD UI & API
+          - path: /argocd/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: argocd-server-external
+                port:
+                  number: 80
 
-      # 3. Frontend Web App (Default fallback)
-      - path: /*
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: frontend-service
-            port:
-              number: 80
+          # 3. Frontend Web App (Default fallback)
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
