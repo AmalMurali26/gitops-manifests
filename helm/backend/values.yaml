@@ -1,12 +1,9 @@
 global:
   namespace: three-tier-app
-
 image:
   repository: asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/backend-repo/backend
-  tag: 8
-
+  tag: 10
 port: 5000
-
 autoscaling:
   minReplicas: 2
   maxReplicas: 5
