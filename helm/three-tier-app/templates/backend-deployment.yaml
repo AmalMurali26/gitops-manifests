@@ -13,23 +13,33 @@ spec:
       labels:
         app: backend
     spec:
+      serviceAccountName: gke-service-sa
       containers:
       - name: backend
         image: {{ if kindIs "map" .Values.backend.image }}"{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"{{ else if .Values.backend.tag }}"{{ .Values.backend.image }}:{{ .Values.backend.tag }}"{{ else }}"{{ .Values.backend.image }}"{{ end }}
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: {{ .Values.backend.port }}
+        - containerPort: {{ .Values.backend.port | default 5000 }}
         env:
         - name: DB_HOST
-          value: "postgres-service"
+          value: "127.0.0.1"
         - name: DB_PORT
-          value: "{{ .Values.postgres.port | default 5432 }}"
+          value: "5432"
         - name: DB_NAME
-          value: "{{ .Values.postgres.dbName | default "webapp" }}"
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: dbname
         - name: DB_USER
-          value: "{{ .Values.postgres.user | default "postgres" }}"
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
         - name: DB_PASSWORD
-          value: "{{ .Values.postgres.password | default "postgres" }}"
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
         resources:
           requests:
             cpu: 100m
@@ -37,3 +47,20 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0
+        args:
+          # Replace with your instance connection name: PROJECT_ID:REGION:INSTANCE_NAME
+          - "--structured-logs"
+          - "--port=5432"
+          - "project-2f0ca310-6577-4bf2-93e:asia-south1:three-tier-db"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
