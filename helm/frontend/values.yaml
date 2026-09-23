@@ -2,7 +2,12 @@ global:
   namespace: three-tier-app
 image:
   repository: asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend
+<<<<<<< HEAD
   tag: 7
+=======
+  tag: <NEW_TAG_NUMBER>
+
+>>>>>>> 5dc706e (chore: deploy data entry frontend UI)
 port: 80
 autoscaling:
   minReplicas: 2
