@@ -15,10 +15,10 @@ spec:
       serviceAccountName: gke-service-sa
       containers:
       - name: backend
-        image: {{ if kindIs "map" .Values.backend.image }}"{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"{{ else if .Values.backend.tag }}"{{ .Values.backend.image }}:{{ .Values.backend.tag }}"{{ else }}"{{ .Values.backend.image }}"{{ end }}
+        image: {{ if kindIs "map" .Values.image.repository }}"{{ .Values.image.repository.repository }}:{{ .Values.image.repository.tag }}"{{ else if .Values.image.tag }}"{{ .Values.image.repository }}:{{ .Values.image.tag }}"{{ else }}"{{ .Values.image.repository }}"{{ end }}
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: {{ .Values.backend.port | default 5000 }}
+        - containerPort: {{ .Values.port | default 5000 }}
         env:
         - name: DB_HOST
           value: "127.0.0.1"
