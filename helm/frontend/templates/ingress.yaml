@@ -9,7 +9,6 @@ spec:
   rules:
     - http:
         paths:
-          # 1. Backend REST API (matches /api and /api/users)
           - path: /api/*
             pathType: ImplementationSpecific
             backend:
@@ -17,8 +16,13 @@ spec:
                 name: backend-service
                 port:
                   number: 5000
-
-          # 2. ArgoCD UI & API
+          - path: /argocd
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: argocd-server-external
+                port:
+                  number: 80
           - path: /argocd/*
             pathType: ImplementationSpecific
             backend:
@@ -26,8 +30,6 @@ spec:
                 name: argocd-server-external
                 port:
                   number: 80
-
-          # 3. Frontend Web App (Default fallback)
           - path: /*
             pathType: ImplementationSpecific
             backend:

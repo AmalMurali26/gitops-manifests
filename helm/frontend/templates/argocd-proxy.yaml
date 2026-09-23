@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-proxy
+  namespace: three-tier-app
+  labels:
+    app: argocd-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argocd-proxy
+  template:
+    metadata:
+      labels:
+        app: argocd-proxy
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+          requests:
+            cpu: 20m
+            memory: 32Mi
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: argocd-proxy-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-proxy-config
+  namespace: three-tier-app
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+
+        location /healthz {
+            return 200 'ok';
+            add_header Content-Type text/plain;
+        }
+
+        location /argocd/ {
+            proxy_pass http://argocd-server.argocd.svc.cluster.local:80;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+
+        location = /argocd {
+            return 301 /argocd/;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server-external
+  namespace: three-tier-app
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: ClusterIP
+  selector:
+    app: argocd-proxy
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
