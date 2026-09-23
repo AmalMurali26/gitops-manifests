@@ -4,7 +4,7 @@ global:
   namespace: "three-tier-app"
 frontend:
   image: "asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend"
-  tag: "5"
+  tag: "6"
   replicas: 2
   port: 80
   resources:
