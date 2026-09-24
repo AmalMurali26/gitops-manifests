@@ -71,9 +71,9 @@ data:
             return 301 /argocd/;
         }
 
-        # Grafana Routing
+        # Grafana Routing (preserve URI prefix)
         location /grafana/ {
-            proxy_pass http://prometheus-stack-grafana.monitoring.svc.cluster.local:80/;
+            proxy_pass http://prometheus-stack-grafana.monitoring.svc.cluster.local:80;
             proxy_set_header Host $http_host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
