@@ -7,33 +7,54 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-    - http:
-        paths:
-          - path: /api/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: backend-service
-                port:
-                  number: 5000
-          - path: /argocd
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: argocd-server-external
-                port:
-                  number: 80
-          - path: /argocd/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: argocd-server-external
-                port:
-                  number: 80
-          - path: /*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: frontend-service
-                port:
-                  number: 80
+  - http:
+      paths:
+      # Backend REST API
+      - path: /api/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5000
+
+      # ArgoCD
+      - path: /argocd
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+      - path: /argocd/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+
+      # Grafana Dashboard
+      - path: /grafana
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+      - path: /grafana/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+
+      # Frontend UI Fallback
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80

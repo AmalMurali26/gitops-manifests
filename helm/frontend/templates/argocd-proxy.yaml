@@ -51,9 +51,30 @@ data:
             add_header Content-Type text/plain;
         }
 
+        # ArgoCD Routing
         location /argocd/ {
             proxy_pass http://argocd-server.argocd.svc.cluster.local:80;
-            proxy_set_header Host $host;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Prefix /argocd;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_redirect off;
+            sub_filter '<base href="/">' '<base href="/argocd/">';
+            sub_filter_once on;
+        }
+
+        location = /argocd {
+            return 301 /argocd/;
+        }
+
+        # Grafana Routing
+        location /grafana/ {
+            proxy_pass http://prometheus-stack-grafana.monitoring.svc.cluster.local:80/;
+            proxy_set_header Host $http_host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
@@ -62,8 +83,8 @@ data:
             proxy_set_header Connection "upgrade";
         }
 
-        location = /argocd {
-            return 301 /argocd/;
+        location = /grafana {
+            return 301 /grafana/;
         }
     }
 ---
