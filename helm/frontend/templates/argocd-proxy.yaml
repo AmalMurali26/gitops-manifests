@@ -51,7 +51,7 @@ data:
             add_header Content-Type text/plain;
         }
 
-        # ArgoCD Routing
+        # ArgoCD
         location /argocd/ {
             proxy_pass http://argocd-server.argocd.svc.cluster.local:80;
             proxy_set_header Host $http_host;
@@ -71,7 +71,7 @@ data:
             return 301 /argocd/;
         }
 
-        # Grafana Routing (preserve URI prefix)
+        # Grafana
         location /grafana/ {
             proxy_pass http://prometheus-stack-grafana.monitoring.svc.cluster.local:80;
             proxy_set_header Host $http_host;
@@ -85,6 +85,22 @@ data:
 
         location = /grafana {
             return 301 /grafana/;
+        }
+
+        # Prometheus Server UI
+        location /prometheus/ {
+            proxy_pass http://prometheus-stack-kube-prom-prometheus.monitoring.svc.cluster.local:9090;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+
+        location = /prometheus {
+            return 301 /prometheus/;
         }
     }
 ---

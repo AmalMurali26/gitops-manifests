@@ -34,7 +34,7 @@ spec:
             port:
               number: 80
 
-      # Grafana Dashboard
+      # Grafana
       - path: /grafana
         pathType: ImplementationSpecific
         backend:
@@ -50,7 +50,23 @@ spec:
             port:
               number: 80
 
-      # Frontend UI Fallback
+      # Prometheus Server
+      - path: /prometheus
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+      - path: /prometheus/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server-external
+            port:
+              number: 80
+
+      # Frontend UI (Catch-all)
       - path: /*
         pathType: ImplementationSpecific
         backend:
