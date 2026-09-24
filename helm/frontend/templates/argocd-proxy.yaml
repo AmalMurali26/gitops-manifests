@@ -97,6 +97,8 @@ data:
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            proxy_redirect /query /prometheus/query;
+            proxy_redirect / /prometheus/;
             sub_filter 'href="/' 'href="/prometheus/';
             sub_filter 'src="/' 'src="/prometheus/';
             sub_filter_once off;
