@@ -1,0 +1,33 @@
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'amalmuralipallikkara@gmail.com'
+      smtp_auth_username: 'amalmuralipallikkara@gmail.com'
+      smtp_auth_password: 'jegf bexc wrno qqfd'
+      smtp_require_tls: true
+
+    route:
+      group_by: ['alertname', 'namespace']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'email-notifications'
+      routes:
+        # Suppress the default always-firing Watchdog test alert
+        - matchers:
+            - alertname = Watchdog
+          receiver: 'null'
+        # Send all actual alerts to the email receiver
+        - receiver: 'email-notifications'
+          continue: true
+
+    receivers:
+      - name: 'null'
+      - name: 'email-notifications'
+        email_configs:
+          - to: 'amaledu45@gmail.com'
+            send_resolved: true
+            headers:
+              Subject: '[GKE Alert] {{ .CommonLabels.alertname }} ({{ .CommonLabels.namespace }})'
