@@ -1,6 +1,6 @@
 global:
   namespace: three-tier-app
-replicaCount: 2
+replicaCount: 1
 image:
   repository: asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend
   tag: 8
@@ -11,8 +11,8 @@ service:
   targetPort: 80
 autoscaling:
   enabled: false
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 1
   targetCPUUtilizationPercentage: 80
 resources:
   limits:
