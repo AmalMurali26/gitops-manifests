@@ -73,12 +73,12 @@ spec:
           timeoutSeconds: 2
           failureThreshold: 2
 
-      - name: cloud-sql-proxy
+      name: cloud-sql-proxy
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0
         args:
           - "--structured-logs"
-          - "--port=$(DB_PORT)"
-          - "$(INSTANCE_CONNECTION_NAME)"
+          - "--port=5432"
+          - "project-2f0ca310-6577-4bf2-93e:asia-south1:three-tier-db"
         securityContext:
           runAsNonRoot: true
           allowPrivilegeEscalation: false
