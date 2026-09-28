@@ -13,12 +13,22 @@ spec:
         app: backend
     spec:
       serviceAccountName: gke-service-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       containers:
       - name: backend
         image: {{ if kindIs "map" .Values.image.repository }}"{{ .Values.image.repository.repository }}:{{ .Values.image.repository.tag }}"{{ else if .Values.image.tag }}"{{ .Values.image.repository }}:{{ .Values.image.tag }}"{{ else }}"{{ .Values.image.repository }}"{{ end }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: {{ .Values.port | default 5000 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         env:
         - name: DB_HOST
           value: "127.0.0.1"
@@ -46,15 +56,36 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: {{ .Values.port | default 5000 }}
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: {{ .Values.port | default 5000 }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 2
 
       - name: cloud-sql-proxy
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0
         args:
-          # Replace with your instance connection name: PROJECT_ID:REGION:INSTANCE_NAME
           - "--structured-logs"
-          - "--port=5432"
-          - "project-2f0ca310-6577-4bf2-93e:asia-south1:three-tier-db"
+          - "--port=$(DB_PORT)"
+          - "$(INSTANCE_CONNECTION_NAME)"
         securityContext:
           runAsNonRoot: true
+          allowPrivilegeEscalation: false
         resources:
-  {{- toYaml .Values.resources | nindent 12 }}
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
