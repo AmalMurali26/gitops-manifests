@@ -3,7 +3,7 @@ global:
 replicaCount: 1
 image:
   repository: asia-south1-docker.pkg.dev/project-2f0ca310-6577-4bf2-93e/frontend-repo/frontend
-  tag: 11
+  tag: 12
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
